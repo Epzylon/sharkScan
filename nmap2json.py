@@ -60,7 +60,8 @@ class NmapScanToJson(object):
 
 			#Dictionary of each host
 			hostDict = {}
-			
+
 			hostDict.update(self.__get_addresses(host))
 
 
+			self.jsonDict.update(hostDict)
