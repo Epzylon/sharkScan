@@ -57,9 +57,10 @@ class NmapScanToJson(object):
 
 		#Walking over the xml host by host
 		for host in xmlObject.findall(self.x_host):
+
 			#Dictionary of each host
 			hostDict = {}
+			
+			hostDict.update(self.__get_addresses(host))
 
-			#Walking over each port
-			for port in host.findall(self.ports):
 
