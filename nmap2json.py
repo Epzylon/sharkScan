@@ -23,13 +23,26 @@ class NmapScanToJson(object):
 	a_type = 'addrtype'
 	a_addr = 'addr'
 
+	#Os attribs
+	o_name = 'name'
+	o_accuracy = 'accuracy'
+	o_class = 'type'
+	o_vendor = 'vendor'
+	o_family = 'osfamily'
+	o_version = 'osgen'
+	o_cpe = './cpe'
+
+	#Port attibs
+	p_num = 'portid'
+	p_proto = 'protocol'
+	p_state = 'state'
+
 	#Address type
 	ip_type = 'ipv4'
 
 	def __init__(self,xml):
 		self.xml = xml
-		self.jsonDict = {}
-		self.debug = True
+		self.jsonDict = {"hosts":[]}
 		try:
 			self._xml_fd = open(xml,"r")
 		except:
@@ -48,13 +61,57 @@ class NmapScanToJson(object):
 					
 				#return the address
 				return({"address": addr_num})
-					
+	def __get_ports(self,host):
+
+		#Just open ports
+		tcp_ports = []
+		upd_ports = []
+		#Walking over each port
+		for port in host.find(self.x_ports):
+			#Getting the port info
+			number = port.attrib.get(self.p_num)
+			protocol = port.attrib.get(self.p_proto)
+			state = port.find(self.p_state).attrib.get(self.p_state)
+			#Saving open ports
+			if state == "open":
+				if protocol == "tcp":
+					tcp_ports.append(number)
+				if protocol == "udp":
+					upd_ports.append(number)
+	
+		return({"tcp_ports": tcp_ports, "upd_ports": upd_ports})
+
+	def __get_os(self,host):
+		os_matchs = []
+
+		match = host.find(self.x_os)
+		for possible in match.findall(self.x_osmatch):
+			name = possible.attrib.get(self.o_name)
+			accuracy = possible.attrib.get(self.o_accuracy)
+			possible_class = possible.find(self.x_osclass)
+			osclass = possible_class.attrib.get(self.o_class)
+			vendor = possible_class.attrib.get(self.o_vendor)
+			family = possible_class.attrib.get(self.o_family)
+			version = possible_class.attrib.get(self.o_version)
+			cpe = possible_class.find(self.o_cpe).text
+
+			os_possible = {
+			"name":name,
+			"accuracy":accuracy,
+			"class":osclass,
+			"vendor":vendor,
+			"family":family,
+			"version":version,
+			"cpe":cpe
+			}
+			os_matchs.append(os_possible)
+			return({"os_matchs":os_matchs})
+
 
 
 	def _parse(self):
 		#xmlObject: contains the xml object of the scan
 		xmlObject = ET.fromstringlist(self._xml_fd)
-
 		#Walking over the xml host by host
 		for host in xmlObject.findall(self.x_host):
 
@@ -62,6 +119,10 @@ class NmapScanToJson(object):
 			hostDict = {}
 
 			hostDict.update(self.__get_addresses(host))
+			hostDict.update(self.__get_ports(host))
+			hostDict.update(self.__get_os(host))
+			
+
+			self.jsonDict["hosts"].append(hostDict)
 
 
-			self.jsonDict.update(hostDict)
