@@ -3,7 +3,9 @@ import xml.etree.ElementTree as ET
 from json import dumps as jsdump
 
 class CantOpenXML(Exception):
-	pass
+	def __init__(self,filename):
+		self.filename = filename
+		print("Can't open XML: " + self.filename)
 
 class NmapScanToJson(object):
 	#Main tags
@@ -52,8 +54,9 @@ class NmapScanToJson(object):
 		try:
 			self._xml_fd = open(xml,"r")
 		except:
-			raise CantOpenXML
-		self._parse()
+			raise CantOpenXML(self.xml)
+		else:
+			self._parse()
 
 	def __get_status(self,host):
 		#get the host status
