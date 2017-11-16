@@ -121,32 +121,33 @@ class NmapScanToJson(object):
 		os_matchs = []
 
 		match = host.find(self.x_os)
-		for possible in match.findall(self.x_osmatch):
+		if match != None:
+			for possible in match.findall(self.x_osmatch):
 
-			#OSMATCH
-			name = possible.attrib.get(self.o_name)
-			accuracy = possible.attrib.get(self.o_accuracy)
+				#OSMATCH
+				name = possible.attrib.get(self.o_name)
+				accuracy = possible.attrib.get(self.o_accuracy)
 
-			#OSCLASS
-			possible_class = possible.find(self.x_osclass)
-			osclass = possible_class.attrib.get(self.o_class)
-			vendor = possible_class.attrib.get(self.o_vendor)
-			family = possible_class.attrib.get(self.o_family)
-			version = possible_class.attrib.get(self.o_version)
-			cpe = possible_class.find(self.o_cpe).text
+				#OSCLASS
+				possible_class = possible.find(self.x_osclass)
+				osclass = possible_class.attrib.get(self.o_class)
+				vendor = possible_class.attrib.get(self.o_vendor)
+				family = possible_class.attrib.get(self.o_family)
+				version = possible_class.attrib.get(self.o_version)
+				cpe = possible_class.find(self.o_cpe).text
 
-			os_possible = {
-			"name":name,
-			"accuracy":accuracy,
-			"class":osclass,
-			"vendor":vendor,
-			"family":family,
-			"version":version,
-			"cpe":cpe
-			}
-			os_matchs.append(os_possible)
-		if os_matchs != []:
-			result.update({"os_match":os_matchs})
+				os_possible = {
+				"name":name,
+				"accuracy":accuracy,
+				"class":osclass,
+				"vendor":vendor,
+				"family":family,
+				"version":version,
+				"cpe":cpe
+				}
+				os_matchs.append(os_possible)
+			if os_matchs != []:
+				result.update({"os_match":os_matchs})
 
 		return(result)
 
