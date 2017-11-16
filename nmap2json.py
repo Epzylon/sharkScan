@@ -52,7 +52,7 @@ class NmapScanToJson(object):
 			self._xml_fd = open(xml,"r")
 		except:
 			raise CantOpenXML
-
+		self._parse()
 
 	def __get_status(self,host):
 		#get the host status
@@ -151,5 +151,3 @@ class NmapScanToJson(object):
 				self.jsonDict["hosts"].append(hostDict)
 			else:
 				continue
-
-
