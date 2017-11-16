@@ -76,9 +76,13 @@ class NmapScanToJson(object):
 				return({"address": addr_num})
 	def __get_ports(self,host):
 
+		#Result
+		result = {}
+
 		#Just open ports
 		tcp_ports = []
-		upd_ports = []
+		udp_ports = []
+
 		#Walking over each port
 		for port in host.find(self.x_ports):
 			#Getting the port info
@@ -90,9 +94,15 @@ class NmapScanToJson(object):
 				if protocol == "tcp":
 					tcp_ports.append(number)
 				if protocol == "udp":
-					upd_ports.append(number)
-	
-		return({"tcp_ports": tcp_ports, "upd_ports": upd_ports})
+					udp_ports.append(number)
+
+		if tcp_ports != []:
+			result.update({"tcp_ports": tcp_ports})
+
+		if udp_ports != []:
+			result.update({"udp_ports": udp_ports})
+
+		return(result)
 
 
 	def __get_os(self,host):
