@@ -14,6 +14,7 @@ class NmapScanToJson(object):
 	x_osmatch = './osmatch'
 	x_osclass = './osclass'
 	x_hostscript = './hostscript'
+	x_status = './status'
 
 	#Host attribs
 	h_start = 'starttime'
@@ -40,6 +41,10 @@ class NmapScanToJson(object):
 	#Address type
 	ip_type = 'ipv4'
 
+	#Status state
+	s_state = 'state'
+	s_must = 'up'
+
 	def __init__(self,xml):
 		self.xml = xml
 		self.jsonDict = {"hosts":[]}
@@ -47,6 +52,13 @@ class NmapScanToJson(object):
 			self._xml_fd = open(xml,"r")
 		except:
 			raise CantOpenXML
+
+
+	def __get_status(self,host):
+		#get the host status
+		status = host.find(self.x_status).attrib.get(self.s_state)
+		return(status)
+
 
 	def __get_addresses(self,host):
 		#Walking over each address of the host
@@ -126,15 +138,18 @@ class NmapScanToJson(object):
 		#Walking over the xml host by host
 		for host in xmlObject.findall(self.x_host):
 
-			#Dictionary of each host
-			hostDict = {}
+			if self.__get_status(host) == self.s_must:
+				#Dictionary of each host
+				hostDict = {}
 
-			hostDict.update(self.__get_addresses(host))
-			hostDict.update(self.__get_ports(host))
-			hostDict.update(self.__get_os(host))
-			hostDict.update(self.__get_hostname(host))
-			
+				hostDict.update(self.__get_addresses(host))
+				hostDict.update(self.__get_ports(host))
+				hostDict.update(self.__get_os(host))
+				hostDict.update(self.__get_hostname(host))
+				
 
-			self.jsonDict["hosts"].append(hostDict)
+				self.jsonDict["hosts"].append(hostDict)
+			else:
+				continue
 
 
