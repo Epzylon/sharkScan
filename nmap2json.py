@@ -81,6 +81,7 @@ class NmapScanToJson(object):
 	
 		return({"tcp_ports": tcp_ports, "upd_ports": upd_ports})
 
+
 	def __get_os(self,host):
 		os_matchs = []
 
@@ -105,8 +106,18 @@ class NmapScanToJson(object):
 			"cpe":cpe
 			}
 			os_matchs.append(os_possible)
-			return({"os_matchs":os_matchs})
+			return({"os_matchs":os_matchs)
 
+
+	def __get_hostname(self,host):
+		hostnames = []
+
+		#Walking over hostnames
+		for hostname in host.find(self.x_hostnames):
+			name = hostname.attrib.get(self.h_name)
+			hostnames.append(name)
+
+		return({"hostnames":hostnames})
 
 
 	def _parse(self):
@@ -121,6 +132,7 @@ class NmapScanToJson(object):
 			hostDict.update(self.__get_addresses(host))
 			hostDict.update(self.__get_ports(host))
 			hostDict.update(self.__get_os(host))
+			hostDict.update(self.__get_hostname(host))
 			
 
 			self.jsonDict["hosts"].append(hostDict)
