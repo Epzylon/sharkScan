@@ -62,6 +62,10 @@ class NmapScanToJson(object):
 
 
 	def __get_addresses(self,host):
+
+		result = {}
+		addresses = []
+
 		#Walking over each address of the host
 		for address in host.findall(self.x_address):
 
@@ -71,9 +75,13 @@ class NmapScanToJson(object):
 			if addr_type == self.ip_type:
 				#Get the ip address
 				addr_num = address.attrib.get(self.a_addr)
-					
-				#return the address
-				return({"address": addr_num})
+				addresses.append(addr_num)
+				
+		#return the address
+		if addresses != []:
+			result.update({"address":addresses[0]})
+
+		return(result)
 
 
 	def __get_ports(self,host):
@@ -139,7 +147,7 @@ class NmapScanToJson(object):
 			os_matchs.append(os_possible)
 		if os_matchs != []:
 			result.update({"os_match":os_matchs})
-			
+
 		return(result)
 
 
