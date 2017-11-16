@@ -1,5 +1,6 @@
 # Parse from XML Nmap to json
 import xml.etree.ElementTree as ET
+from json import dumps as jsdump
 
 class CantOpenXML(Exception):
 	pass
@@ -99,8 +100,12 @@ class NmapScanToJson(object):
 
 		match = host.find(self.x_os)
 		for possible in match.findall(self.x_osmatch):
+
+			#OSMATCH
 			name = possible.attrib.get(self.o_name)
 			accuracy = possible.attrib.get(self.o_accuracy)
+
+			#OSCLASS
 			possible_class = possible.find(self.x_osclass)
 			osclass = possible_class.attrib.get(self.o_class)
 			vendor = possible_class.attrib.get(self.o_vendor)
@@ -118,7 +123,7 @@ class NmapScanToJson(object):
 			"cpe":cpe
 			}
 			os_matchs.append(os_possible)
-			return({"os_matchs":os_matchs)
+		return({"os_matchs":os_matchs})
 
 
 	def __get_hostname(self,host):
@@ -151,3 +156,6 @@ class NmapScanToJson(object):
 				self.jsonDict["hosts"].append(hostDict)
 			else:
 				continue
+
+	def get_json(self):
+		return(jsdump(self.jsonDict))
