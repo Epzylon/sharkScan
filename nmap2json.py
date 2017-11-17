@@ -19,10 +19,8 @@ class NmapScanToJson(object):
 	x_osclass = './osclass'
 	x_hostscript = './hostscript'
 	x_status = './status'
-
-	#Host attribs
-	h_start = 'starttime'
-	h_end = 'endtime'
+	x_runstats = './runstats'
+	x_finished = x_runstats + '/finished'
 
 	#Address attribs
 	a_type = 'addrtype'
@@ -49,11 +47,19 @@ class NmapScanToJson(object):
 	s_state = 'state'
 	s_must = 'up'
 
+	#Scan attrib
+	scan_start = 'start'
+	scan_time = 'time'
+	scan_elapsed = 'elapsed'
+	scan_summary = 'summary'
+	scan_exit = 'exit'
+
+
 	def __init__(self,xml):
 		self.xml = xml
 		self.jsonDict = {"hosts":[]}
 		try:
-			self._xml_fd = open(xml,"r")
+			self._xml_fd = open(self.xml,"r")
 		except:
 			raise CantOpenXML(self.xml)
 		else:
@@ -171,10 +177,37 @@ class NmapScanToJson(object):
 
 		return(result)
 
+	def __get_stats(self,scan):
+		#Getting the start time
+		start_time = scan.attrib.get(self.scan_start)
+		finished = scan.find(self.x_finished)
+		end_time = finished.attrib.get(self.scan_time)
+		elapsed = finished.attrib.get(self.scan_elapsed)
+		summary = finished.attrib.get(self.scan_summary)
+		exit = finished.attrib.get(self.scan_exit)
+
+		stats = {
+		"stats": 
+			{
+			"start_time":start_time,
+			"finish_time":end_time,
+			"elapsed":elapsed,
+			"summary":summary,
+			"exit":exit
+			}
+		}
+
+		return(stats)
+
+
 
 	def _parse(self):
 		#xmlObject: contains the xml object of the scan
 		xmlObject = ET.fromstringlist(self._xml_fd)
+		
+		#Setting the stats section
+		self.jsonDict.update(self.__get_stats(xmlObject))
+		
 		#Walking over the xml host by host
 		for host in xmlObject.findall(self.x_host):
 

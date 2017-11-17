@@ -43,7 +43,6 @@ class uploadScan(object):
 			print("Not possible make the connection")
 			return False
 		else:
-			print("Connection ok")
 			return True
 
 
