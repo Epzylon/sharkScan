@@ -57,12 +57,14 @@ class NmapScanToJson(object):
 
 	def __init__(self,xml):
 		self.xml = xml
+		self.name = ""
 		self.jsonDict = {"hosts":[]}
 		try:
 			self._xml_fd = open(self.xml,"r")
 		except:
 			raise CantOpenXML(self.xml)
 		else:
+			self._xml_list = self._xml_fd.readlines()
 			self._parse()
 
 	def __get_status(self,host):
@@ -203,11 +205,16 @@ class NmapScanToJson(object):
 
 	def _parse(self):
 		#xmlObject: contains the xml object of the scan
-		xmlObject = ET.fromstringlist(self._xml_fd)
+		xmlObject = ET.fromstringlist(self._xml_list)
 		
 		#Setting the stats section
 		self.jsonDict.update(self.__get_stats(xmlObject))
-		
+
+		#Setting the scan name
+		if self.name != "":
+			print("setting name on json")
+			self.jsonDict.update({"name": self.name})
+
 		#Walking over the xml host by host
 		for host in xmlObject.findall(self.x_host):
 
@@ -224,6 +231,10 @@ class NmapScanToJson(object):
 				self.jsonDict["hosts"].append(hostDict)
 			else:
 				continue
+
+	def set_name(self,name):
+		self.jsonDict.update({"name":name})
+		self._parse()
 
 	def get_json(self):
 		#TODO: this most probably needs a fix

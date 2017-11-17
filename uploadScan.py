@@ -14,6 +14,10 @@ class uploadScan(object):
 		self.xml = xml
 		self.db = db
 		self.json = ""
+		filename = self.xml.split('/')[-1]
+		point = filename.rfind('.')
+		self.name = filename[:point]
+		print(self.name)
 
 	def __connect(self):
 		#By default connect to localhost
@@ -29,12 +33,14 @@ class uploadScan(object):
 
 	def __parse(self):
 		parser = nmapParser(self.xml)
+		parser.set_name(self.name)
 		self.json = parser.get_json()
+
 
 	def upload(self):
 		self.__connect()
 		self.__parse()
-		self.scans.insert(self.json)
+		return(self.scans.insert(self.json))
 
 	def test_db(self):
 		try:
@@ -44,7 +50,3 @@ class uploadScan(object):
 			return False
 		else:
 			return True
-
-
-
-
