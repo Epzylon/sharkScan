@@ -1,6 +1,7 @@
 # Parse from XML Nmap to json
 import xml.etree.ElementTree as ET
 from json import dumps as jsdump
+from json import loads as jsload
 
 class CantOpenXML(Exception):
 	def __init__(self,filename):
@@ -192,4 +193,5 @@ class NmapScanToJson(object):
 				continue
 
 	def get_json(self):
-		return(jsdump(self.jsonDict))
+		#TODO: this most probably needs a fix
+		return(jsload(jsdump(self.jsonDict)))
