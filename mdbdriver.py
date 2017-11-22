@@ -1,4 +1,4 @@
-from json import loads
+from json import loads, dumps
 from pymongo import MongoClient as connect
 from nmap2json import NmapScanToJson as nmapParser
 
@@ -7,6 +7,51 @@ class CantOpenDB(Exception):
 	def __init__(self,db):
 		self.db = db
 		print("Can't open db: " + self.db)
+
+class mdb(object):
+	def __init__(self,dbstring="mongodb://localhost"):
+		self.dbstring = dbstring
+		self.db = "sharkScan"
+		self.collection = "scans"
+		self.projection = { "_id": 0 }
+
+
+	def connect(self):
+		try:
+			#Mongo connection
+			self.connection = connect(self.dbstring)
+			self._db = self.connection[self.db]
+			self._collection = self._db[self.collection]
+		except:
+			raise CantOpenDB()
+		else:
+			return True
+
+	def disconnect(self):
+		self.connection.close()
+
+	def get_SavedScans(self):
+		query = {}
+		projection = { "_id": 0, "name": 1, "stats":1 }
+		cursor = self._collection.find(query,projection)
+		total = []
+		for c in cursor:
+			total.append(c)
+		return(dumps(total))
+
+
+	def get_RunningScans(self):
+		pass
+
+	def get_ScansByDate(self,date):
+		pass 
+
+	def get_hostInScan(self,address):
+		pass
+
+	def get_ScanByName(self,name):
+		query = { "name": name }
+		return(dumps(self._collection.find_one(query,self.projection)))
 
 
 class uploadScan(object):

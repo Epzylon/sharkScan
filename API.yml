@@ -42,7 +42,7 @@ mediaType: application/json
             "summary" : "Nmap done at Thu Jun  1 13:04:49 2017; 131072 IP addresses (131072 hosts up) scanned in 5060.10 seconds",
             "exit" : "success"
           },
-          "name" : "scan.torre.010617-11.40"
+          "name" : "scan.of.my.network"
           }
       201:
         description: The scan was found but not completed yet
@@ -54,7 +54,7 @@ mediaType: application/json
     body:
       example: |
       {
-        "name": "Scan from my network",
+        "name": "scan.of.my.network",
         "type": "nmap-os",
         "args": "--script smb-os-discovery"
         "target": "192.168.0.0/16"
