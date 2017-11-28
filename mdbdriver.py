@@ -32,11 +32,11 @@ class mdb(object):
 
 	def get_SavedScans(self):
 		query = {}
-		projection = { "_id": 0, "name": 1, "stats":1 }
+		projection = { "_id": 0, "name": 1}
 		cursor = self._collection.find(query,projection)
-		total = []
+		total = {"scans":[]}
 		for c in cursor:
-			total.append(c)
+		 	total['scans'].append(c)
 		return(dumps(total))
 
 
