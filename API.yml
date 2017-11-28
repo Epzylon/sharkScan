@@ -65,6 +65,21 @@ mediaType: application/json
         description: The scan was found but not completed yet
       404:
         description: The scan was not found
+    /{address}
+      description: Info belong to just one host
+        uriParameters:
+          address:
+            description: IP address of the host
+      responses:
+        200:
+          body:
+            example: |
+            {
+            "address" : "76.220.45.101", 
+            "tcp_ports" : [ "445" ] 
+            }
+        404:
+          description: The host was not found in this scan
 
   post:
     description: Post a new scan request
@@ -79,38 +94,3 @@ mediaType: application/json
       responses:
         202:
           description: The request has been made
-
-/hostInScan:
-  get:
-    description: Show info about one host(by address) in a particular scan
-    queryParameters:
-      name:
-        description: Name of the scan
-      address:
-        description: IP address of the host
-    responses:
-      200:
-        description: Host found on the scan
-        body:
-          sample: |
-          {
-            "address": "192.168.1.1",
-            "hostname": "testserver"
-            "tcp_ports": [22,3389],
-            "udp_ports": [53,161],
-            "os_matchs": [
-              {
-                "name":"MS 7 SP1",
-                "accuracy":"99",
-                "class":"general propouse",
-                "vendor":"Microsoft",
-                "family":"Windows",
-                "version":"7",
-                "cpe":"cpe:/o:microsoft:windows_server_2008"
-              }
-            ]
-          }
-      404:
-        description: The host was not found on the scan
-      412:
-        description: The scan was not found
