@@ -4,7 +4,7 @@ baseUri: http://localhost/api/{version}
 version: v1.0
 mediaType: application/json
 
-/Scan:
+/Scans:
   get:
     description: get all the scans saved showing name and stats
     queryParameters:
