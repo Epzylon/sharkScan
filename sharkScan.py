@@ -12,25 +12,35 @@ response_type = 'application/json'
 
 
 
-@route('/api/v1.0/Scan')
-def get_scan():
+@route('/api/v1.0/Scans')
+@route('/api/v1.0/Scans/<name>'):
+@route('/api/v1.0/Scans/<name>/<address>'):
+def get_scan(name=None,address=None,date=None):
 	''' Retrieve all the scans saved showing name and stats'''
+	
+	#When use just /Scans there are uri parameters available:
+	# name of the scan
+	# date of the scans
 	name = request.query.name
 	date = request.query.date
-	if name != "" and date == "":
+
+	#If only name is specified as uri parameter or query parameter
+	if name != None and date == None:
 		response.content_type = response_type
 		return(db.get_ScanByName(name))
-	elif name != "" and date != "":
+
+	elif name != None and date == None:
+		response.content_type = response_type
 		pass
+
 	else:
+		#If no parameter was provided
 		response.content_type = response_type
 		return(db.get_SavedScans())
 
-# @route('/api/v1.0/Scan/<name>'):
-# 	pass
 
-# @route('/api/v1.0/Scan/<name>/<address>'):
-#	pass
+
+
 
 
 run(host='localhost',port=9898)

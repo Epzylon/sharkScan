@@ -30,8 +30,23 @@ class mdb(object):
 	def disconnect(self):
 		self.connection.close()
 
-	def get_SavedScans(self):
+	def get_SavedScans(self,from_date=None,to_date=None):
+		''' Return saved scans optionally filter by date '''
+		
+		#If there is no date filter get all the scans
 		query = {}
+
+		#other wise if a date range was specified:
+		if from_date != None and to_date != None:
+			query = {"$and":[{"stats.start_time":{"$gte":from_date}},{"stats.start_time":{"$lte":to_date}}]}
+
+		elif from_date != None and to_date == None:
+			query = {"stats.start_time":{"$gte":from_date}}
+
+		elif from_date == None and to_date != None:
+			query = {"stats.start_time":{"$lte":to_date}}
+
+
 		projection = { "_id": 0, "name": 1,"stats":1}
 		cursor = self._collection.find(query,projection)
 		total = {"scans":[]}
@@ -43,9 +58,6 @@ class mdb(object):
 
 	def get_RunningScans(self):
 		pass
-
-	def get_ScansByDate(self,date):
-		pass 
 
 	def get_hostInScan(self,address):
 		pass
