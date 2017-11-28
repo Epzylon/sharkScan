@@ -29,7 +29,8 @@ def get_scan():
 # @route('/api/v1.0/Scan/<name>'):
 # 	pass
 
-# @route('/api/v1.0/hostInScan'):
-# 	pass
+# @route('/api/v1.0/Scan/<name>/<address>'):
+#	pass
+
 
 run(host='localhost',port=9898)

@@ -94,3 +94,34 @@ mediaType: application/json
       responses:
         202:
           description: The request has been made
+
+/searchHost:
+  get:
+    description: Search one host (by address) cross all the saved (optionally filtered by date range) scans
+    queryParameters:
+      address:
+        description: IP address of the host
+      from_date:
+        description: Base of the date range
+      to_date:
+        description: Top of the date range
+    responses:
+      200:
+        description: The host was found on a least one scan and list of scans where the host was found is provided
+        body:
+          example: |
+          {
+            "scans": 
+            [
+            {
+              "name":"scanName",
+              "stats": {
+                'start_time': '1494946727',
+                'finish_time': '1494947568',
+                'elapsed': '841.50',
+                'summary': 'Nmap done at Tue May 16 12:12:48 2017; 131072 IP addresses (131072 hosts up) scanned in 841.50 seconds', 'exit': 'success'
+              }
+            ]
+          }
+      400:
+        description: The host was not found on any scan
