@@ -77,7 +77,8 @@ mediaType: application/json
             example: |
             {
             "address" : "76.220.45.101", 
-            "tcp_ports" : [ "445" ] 
+            "tcp_ports" : [ "445" ],
+            "udp_ports" : [ "53" ] 
             }
         404:
           description: The host was not found in this scan
