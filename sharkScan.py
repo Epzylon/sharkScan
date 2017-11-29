@@ -2,7 +2,7 @@
 #sharkScan Back End
 #use APY.yml as API definition
 
-from bottle import route, run, request, response
+from bottle import route, run, response
 from sharkDB.mdbdriver import mdb
 
 db = mdb()
