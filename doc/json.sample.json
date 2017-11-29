@@ -1,0 +1,25 @@
+{"hosts":[
+	{
+	"address":"192.168.1.1",
+	"hostnames": ["locahost","localhost"],
+	"tcp_ports":[22,3389],
+	"upd_ports":[53],
+	"os_matchs":[
+	{
+	"name":"MS 7 SP1",
+	"accuracy":"99",
+	"class":"general propouse",
+	"vendor":"Microsoft",
+	"family":"Windows",
+	"version":"7",
+	"cpe":"cpe:/o:microsoft:windows_server_2008"
+	},
+	{"name":"MS Vista SP1",
+	"vendor":"Microsoft",
+	"family":"Windows",
+	"version":"7"},
+	],
+
+	}
+]
+}
