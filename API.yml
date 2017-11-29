@@ -6,12 +6,13 @@ mediaType: application/json
 
 /Scans:
   get:
-    description: get all the scans saved showing name and stats
+    description: get all the scans saved showing name and stats (optionally filtered by date range - unix time epoch -)
     queryParameters:
-      name:
-        description: name of the saved scan
-      date:
-        description: date of the saved scan
+      from_date:
+        description: base for the date range
+        type: datetime
+      to_date:
+        description: top of the date range
         type: datetime
     responses:
       200:
