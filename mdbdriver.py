@@ -61,8 +61,15 @@ class mdb(object):
 	def get_RunningScans(self):
 		pass
 
-	def get_hostInScan(self,address):
-		pass
+	def get_hostInScan(self,address,scan_name):
+		query = {"name":scan_name}
+		projection = {"_id":0,"hosts":1}
+		hosts = self._collection.find_one(query,projection)['hosts']
+		for host in hosts:
+			if host['address'] == address:
+				return(dumps(host))
+
+
 
 	def get_ScanByName(self,name):
 		query = { "name": name }
