@@ -69,8 +69,6 @@ class mdb(object):
 			if host['address'] == address:
 				return(dumps(host))
 
-
-
 	def get_ScanByName(self,name):
 		query = { "name": name }
 		return(dumps(self._collection.find_one(query,self.projection)))
