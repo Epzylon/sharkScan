@@ -41,6 +41,7 @@ def get_scanByName(name=None):
 @route('/api/v1.0/Scans/<name>/<address>')
 def get_hostScanAddress(name,address):
 	#Get the host in a particular scan
+	response.content_type = response_type
 	return(db.get_hostInScan(address,name))
 
 run(host='localhost',port=9898)
