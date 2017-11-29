@@ -32,9 +32,7 @@ class mdb(object):
 
 	def get_SavedScans(self,from_date=None,to_date=None):
 		''' Return saved scans optionally filter by date '''
-		
-		#If there is no date filter get all the scans
-		query = {}
+
 
 		#other wise if a date range was specified:
 		if from_date != None and to_date != None:
@@ -45,6 +43,10 @@ class mdb(object):
 
 		elif from_date == None and to_date != None:
 			query = {"stats.start_time":{"$lte":to_date}}
+
+		elif from_date == None and to_date == None:
+			#If there is no date filter get all the scans
+			query = {}
 
 
 		projection = { "_id": 0, "name": 1,"stats":1}
