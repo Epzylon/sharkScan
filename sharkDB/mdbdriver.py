@@ -65,18 +65,20 @@ class mdb(object):
 	def get_hostInScan(self,address,scan_name):
 		query = {"name":scan_name}
 		projection = {"_id":0,"hosts":1}
-		hosts = self._collection.find_one(query,projection)['hosts']
-		
-		found = ''
-		
-		for host in hosts:
-			if host['address'] == address:
-				found = host['address'] 
-		
-		if found != '':
-			return(dumps(found))
-		else:
-			return(None)
+		result = self._collection.find_one(query,projection)
+		if result != None:
+			hosts = result['hosts']
+			if hosts != []:
+				found = ''
+			
+				for host in hosts:
+					if host['address'] == address:
+						found = host['address'] 
+			
+				if found != '':
+					return(dumps(found))
+				else:
+					return(None)
 				
 		
 

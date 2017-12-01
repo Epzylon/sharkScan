@@ -62,6 +62,6 @@ def get_hostScanAddress(name,address):
 		return(result)
 	else:
 		response.status = 404
-		return()
+		return
 
 run(host='localhost',port=9898)
