@@ -2,7 +2,7 @@
 #sharkScan Back End
 #use APY.yml as API definition
 
-from bottle import route, run, response
+from bottle import route, run, response, request
 from sharkDB.mdbdriver import mdb
 
 db = mdb()
@@ -13,18 +13,20 @@ response_type = 'application/json'
 
 
 @route('/api/v1.0/Scans')
-def get_scans(from_date=None,to_date=None):
+def get_scans():
+	from_date = request.query.from_date
+	to_date = request.query.to_date
 	response.content_type = response_type
-
-	if from_date != None and to_date == None:
+	
+	if from_date != "" and to_date == "":
 		#from_date given
 		return(db.get_SavedScans(from_date=from_date))
 
-	elif from_date == None and to_date != None:
+	elif from_date == "" and to_date != "":
 		#to_date given
 		return(db.get_SavedScans(to_date=to_date))
 
-	elif from_date != None and to_date != None:
+	elif from_date != "" and to_date != "":
 		#from_date and to_date given
 		return(db.get_SavedScans(from_date=from_date,to_date=to_date))
 
