@@ -1,6 +1,6 @@
 #!env python
 import sys
-from nmap2json import NmapScanToJson as parseNmap
+from sharkPlugins.sharkNmap.nmap2json import NmapScanToJson as parseNmap
 
 filename = str(sys.argv[1])
 
