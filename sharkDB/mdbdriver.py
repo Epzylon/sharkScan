@@ -38,7 +38,6 @@ class mdb(object):
 
 		elif from_date != None and to_date == None:
 			query = {"stats.start_time":{"$gte":from_date}}
-			print("Query:"+ str(query))
 
 		elif from_date == None and to_date != None:
 			query = {"stats.start_time":{"$lte":to_date}}
@@ -53,8 +52,11 @@ class mdb(object):
 		total = {"scans":[]}
 		for c in cursor:
 				total['scans'].append(c)
-
-		return(dumps(total))
+		
+		if len(total['scans']) == 0:
+			return(None)
+		else:
+			return(dumps(total))
 
 
 	def get_RunningScans(self):
@@ -64,13 +66,27 @@ class mdb(object):
 		query = {"name":scan_name}
 		projection = {"_id":0,"hosts":1}
 		hosts = self._collection.find_one(query,projection)['hosts']
+		
+		found = ''
+		
 		for host in hosts:
 			if host['address'] == address:
-				return(dumps(host))
+				found = host['address'] 
+		
+		if found != '':
+			return(dumps(found))
+		else:
+			return(None)
+				
+		
 
 	def get_ScanByName(self,name):
 		query = { "name": name }
-		return(dumps(self._collection.find_one(query,self.projection)))
+		result = self._collection.find_one(query,self.projection)
+		if result == None:
+			return(None)
+		else:
+			return(dumps(result))
 
 
 class uploadScan(object):
