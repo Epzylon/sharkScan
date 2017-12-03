@@ -2,7 +2,7 @@
 import xml.etree.ElementTree as ET
 from json import dumps as jsdump
 from json import loads as jsload
-from nmapxmlconfig import NmapConfig
+from sharkPlugins.sharkNmap.nmapxmlconfig import NmapConfig
 
 class CantOpenXML(Exception):
 	def __init__(self,filename):
