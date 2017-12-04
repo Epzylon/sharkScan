@@ -74,18 +74,26 @@ class mdb(object):
 		else:
 			return(None)
 	
-	def SendNewScan(self,name,scan_type,args,target,schedule_date=None):
-		newScan = {
+	def SendNewScan(self,name,target,scan_type=None,args=None,schedule_date=None):
+		newScan = {				
 				"name":name,
-				"type":scan_type,
-				"args":args,
 				"target":target,
-				"scheduled":schedule_date,
 				"state":"new",
 				"posted_time":int(time())
-				 }
+				}
+		
+		if scan_type != None:
+			newScan.update({"type":scan_type})
+		
+		if args != None:
+			newScan.update({"args":args})
+		
+		if schedule_date != None:
+			newScan.update({"scheduled":schedule_date})
+
 		try:
 			self._running_collection.insert_one(newScan)
+			newScan.pop("_id")
 			return(newScan)
 		except:
 			return(False)

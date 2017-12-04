@@ -1,10 +1,9 @@
 #!env python
 #sharkScan Back End
 #use APY.yml as API definition
-
+from json import load
 from bottle import route, run, response, request
 from sharkDB.mdbdriver import mdb
-from construct.core import Padded
 
 db = mdb()
 db.connect()
@@ -42,12 +41,33 @@ def get_scans():
 
 @route('/api/v1.0/Scans', method='POST')
 def post_scan():
-	name = request.forms.name
-	scan_type = request.forms.type
-	target = request.forms.target
-	args = request.forms.args
-	scheduled_date = request.forms.scheduled_date
-	result = db.SendNewScan(name, scan_type, args, target, scheduled_date)
+	#TODO: Check json code inject
+	post = load(request.body)
+	keys = post.keys()
+	if 'name' in keys and 'target' in keys:
+		name = post['name']
+		target = post['target']
+	else:
+		response.status = 400
+		return({"error":"name and target field are mandatory"})
+	
+	if 'args' in keys:
+		args = post['args']
+	else:
+		args = None
+		
+	if 'scheduled_date' in keys:
+		scheduled_date = post['scheduled_date']
+	else:
+		scheduled_date = None
+		
+	if 'type' in keys:
+		scan_type = post['type']
+	else:
+		scan_type = None
+
+	result = db.SendNewScan(name,target,scan_type,args,scheduled_date)
+
 	if result != False:
 		response.status = 202
 		return(result)
