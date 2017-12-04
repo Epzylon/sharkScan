@@ -46,6 +46,9 @@ def post_scan():
 	keys = post.keys()
 	if 'name' in keys and 'target' in keys:
 		name = post['name']
+		if db.get_ScanByName(name) != None:
+			response.status = 409
+			return({"error":"Duplicated name"})
 		target = post['target']
 	else:
 		response.status = 400
