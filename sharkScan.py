@@ -39,7 +39,21 @@ def get_scans():
 		return()
 	else:
 		return(result)
-	
+
+@route('/api/v1.0/Scans', method='POST')
+def post_scan():
+	name = request.forms.name
+	scan_type = request.forms.type
+	target = request.forms.target
+	args = request.forms.args
+	scheduled_date = request.forms.scheduled_date
+	result = db.SendNewScan(name, scan_type, args, target, scheduled_date)
+	if result != False:
+		response.status = 202
+		return(result)
+	else:
+		response.status = 418
+		return(None)
 
 @route('/api/v1.0/Scans/<name>')
 def get_scanByName(name=None):
