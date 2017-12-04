@@ -1,4 +1,5 @@
-from json import loads, dumps
+from json import dumps
+from time import time
 from pymongo import MongoClient as connect
 from sharkPlugins.sharkNmap.nmap2json import NmapScanToJson as nmapParser
 
@@ -13,6 +14,7 @@ class mdb(object):
 		self.dbstring = dbstring
 		self.db = "sharkScan"
 		self.collection = "scans"
+		self.run_collection = "running"
 		self.projection = { "_id": 0 }
 
 
@@ -22,6 +24,7 @@ class mdb(object):
 			self.connection = connect(self.dbstring)
 			self._db = self.connection[self.db]
 			self._collection = self._db[self.collection]
+			self._running_collection = self._db[self.run_collection]
 		except:
 			raise CantOpenDB()
 		else:
@@ -60,7 +63,33 @@ class mdb(object):
 
 
 	def get_RunningScans(self):
-		pass
+		running = []
+		query = {"state":"running"}
+		projection = {"_id":0, "name":1}
+		cursor = self._running_collection.find(query,projection)
+		for scan in cursor:
+			running.append(scan)
+		if len(running) > 0:
+			return(dumps(running))
+		else:
+			return(None)
+	
+	def SendNewScan(self,name,scan_type,args,target,schedule_date=None):
+		newScan = {
+				"name":name,
+				"type":scan_type,
+				"args":args,
+				"target":target,
+				"scheduled":schedule_date,
+				"state":"new",
+				"posted_time":int(time())
+				 }
+		try:
+			self._running_collection.insert_one(newScan)
+			return(newScan)
+		except:
+			return(False)
+		
 
 	def get_hostInScan(self,address,scan_name):
 		query = {"name":scan_name}
