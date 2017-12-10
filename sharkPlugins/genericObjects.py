@@ -49,7 +49,7 @@ class Plugin(object):
         self.supported_types.append(basic)
         
         #Index for the supported_types array
-        self._selected_type = 0
+        self.selected_type = 0
 
 
         
@@ -84,13 +84,18 @@ class Plugin(object):
         
         self.args = self.args + self.SEPARATOR + self.output_path
         
-
-    def set_target(self, target):                    
+    @property
+    def target(self):
+        return(self._target)
+    
+    @target.setter
+    def target(self, value):     
+        self._target = value               
         #Check if there are target parameter to be set
         if self.target_parameter != None:
             self.args = self.args + self.target_parameter
         
-        self.args = self.args + self.SEPARATOR + target
+        self.args = self.args + self.SEPARATOR + self._target
     
     def run(self):
         self._configure_basics()
