@@ -32,7 +32,7 @@ class scan(Plugin):
         #Scan with OS recognition
         osscan = ScanType("os-scan")
         osscan.description = "OS detection" 
-        osscan.parmeters = "-O -T4"
+        osscan.parameters = "-O -T4"
         osscan.require_privileges = True
         
         self.supported_types.append(osscan)

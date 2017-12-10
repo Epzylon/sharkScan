@@ -11,7 +11,8 @@ class ScanType(object):
         self.privileges_prefix = "sudo"
         
     def __str__(self):
-        return(self.parameters)
+        return(str(self.parameters))
+    
     
 
 class Plugin(object):
@@ -52,9 +53,9 @@ class Plugin(object):
         
         #Check if sudo is required
         if self.supported_types[self.selected_type].require_privileges:
-            self.command = self.privileges_prefix + self.SEPARATOR + self.command
+            self.command = self.supported_types[self.selected_type].privileges_prefix + self.SEPARATOR + self.command
         
-        #Check if there is aditionals parameters on the selected_type
+        #Check if there is additionals parameters on the selected_type
         p = self.supported_types[self.selected_type].parameters
         if  p != None:
             self.args = self.args + self.SEPARATOR + p 
