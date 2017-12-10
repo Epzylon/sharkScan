@@ -80,7 +80,7 @@ class Plugin(object):
         
         #Check if there are output parameter to be set
         if self.output_path != None:
-            self.args = self.args + self.output_parameter
+            self.args = self.args + self.SEPARATOR + self.output_parameter
         
         self.args = self.args + self.SEPARATOR + self.output_path
         
