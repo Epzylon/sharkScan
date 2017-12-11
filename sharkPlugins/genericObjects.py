@@ -61,29 +61,7 @@ class Plugin(object):
     def selected_type(self,value):
         self._selected_type = value
         self._configure_selected_scan()
-    
-    def _configure_selected_scan(self):
-        #Check if sudo is required
-        if self.supported_types[self.selected_type].require_privileges:
-            self.command = self.supported_types[self.selected_type].privileges_prefix + self.SEPARATOR + self.command
-        
-        #Check if there is additionals parameters on the selected_type
-        p = self.supported_types[self.selected_type].parameters
-        if  p != None:
-            self.args = self.args + self.SEPARATOR + p 
-
-            
-    def _configure_basics(self):
-        #Check if there are basic args
-        if self.basic_args != None:
-            self.args = self.basic_args
-        
-        #Check if there are output parameter to be set
-        if self.output_path != None:
-            self.args = self.args + self.SEPARATOR + self.output_parameter
-        
-        self.args = self.args + self.SEPARATOR + self.output_path
-        
+                
     @property
     def target(self):
         return(self._target)
@@ -97,10 +75,27 @@ class Plugin(object):
         
         self.args = self.args + self.SEPARATOR + self._target
     
+    def _configure_selected_scan(self):
+        #Check if sudo is required
+        if self.supported_types[self.selected_type].require_privileges:
+            self.command = self.supported_types[self.selected_type].privileges_prefix + self.SEPARATOR + self.command
+        
+        #Check if there is additionals parameters on the selected_type
+        p = self.supported_types[self.selected_type].parameters
+        if  p != None:
+            self.args = self.args + self.SEPARATOR + p 
+            
+    def _configure_basics(self):
+        #Check if there are basic args
+        if self.basic_args != None:
+            self.args = self.basic_args
+        
+        #Check if there are output parameter to be set
+        if self.output_path != None:
+            self.args = self.args + self.SEPARATOR + self.output_parameter
+        
+        self.args = self.args + self.SEPARATOR + self.output_path
+
     def run(self):
         self._configure_basics()
         system(self.command + self.SEPARATOR + self.args)
-            
-        
-        
-
