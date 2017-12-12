@@ -60,19 +60,25 @@ class mdb(object):
 			return(None)
 		else:
 			return(dumps(total))
-
-
-	def get_RunningScans(self):
-		running = []
-		query = {"state":"running"}
+	
+	def get_ScanByState(self,state):
+		scans = []
+		query = {"state":state}
 		projection = {"_id":0, "name":1}
 		cursor = self._running_collection.find(query,projection)
 		for scan in cursor:
-			running.append(scan)
-		if len(running) > 0:
-			return(dumps(running))
+			scans.append(scan)
+		if len(scans) > 0:
+			return(dumps(scans))
 		else:
 			return(None)
+
+	def get_RunningScans(self):
+		return(self.get_ScanByState("running"))
+	
+	def get_NewScans(self):
+		return(self.get_ScanByState("new"))
+		
 	
 	def SendNewScan(self,name,target,scan_type=None,args=None,schedule_date=None):
 		newScan = {				
