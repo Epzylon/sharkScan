@@ -11,10 +11,8 @@ class ScanType(object):
         self.privileges_prefix = "sudo"
         
     def __str__(self):
-        return(str(self.parameters))
+        return(self.name + ": " + self.parameters)
     
-    
-
 class Plugin(object):
     '''
     Generic Plugin Object
@@ -50,9 +48,7 @@ class Plugin(object):
         
         #Index for the supported_types array
         self.selected_type = 0
-
-
-        
+ 
     @property
     def selected_type(self):
         return(self._selected_type)

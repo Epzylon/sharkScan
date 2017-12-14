@@ -41,12 +41,3 @@ class scan(Plugin):
         self.set_target("127.0.0.1")
         self.selected_type = 1
         self.run()
-        
-
-        
-           
-        
-        
-        
-        
-    

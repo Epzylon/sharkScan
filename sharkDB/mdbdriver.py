@@ -61,23 +61,33 @@ class mdb(object):
 		else:
 			return(dumps(total))
 	
-	def get_ScanByState(self,state):
+	def get_PostedScanByState(self,state):
 		scans = []
 		query = {"state":state}
-		projection = {"_id":0, "name":1}
+		projection = {"_id":0}
 		cursor = self._running_collection.find(query,projection)
 		for scan in cursor:
 			scans.append(scan)
 		if len(scans) > 0:
-			return(dumps(scans))
+			return(scans)
 		else:
 			return(None)
 
 	def get_RunningScans(self):
-		return(self.get_ScanByState("running"))
+		return(self.get_PostedScanByState("running"))
 	
 	def get_NewScans(self):
-		return(self.get_ScanByState("new"))
+		return(self.get_PostedScanByState("new"))
+	
+	def get_NewScanByName(self,name):
+		query = {"state":"new","name":name}
+		return(self._running_collection.find_one(query,self.projection))
+
+	def set_ScanAsRunning(self,name):
+		update = {"$set":{"state":"running"}}
+		search_filter = {"name":name,"state":"new"}
+		
+		self._running_collection.update_one(search_filter,update)
 		
 	
 	def SendNewScan(self,name,target,scan_type=None,args=None,schedule_date=None):
