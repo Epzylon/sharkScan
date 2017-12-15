@@ -105,6 +105,7 @@ class mdb(object):
 			newScan.update({"args":args})
 		
 		if schedule_date != None:
+			schedule_date = str(schedule_date)
 			newScan.update({"scheduled":schedule_date})
 
 		try:
