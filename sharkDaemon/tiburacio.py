@@ -129,7 +129,7 @@ class sharker(object):
     def _find_plugins(self):
         self.plugins = [module for _, module, _ in find_modules(['sharkPlugins'])]
         print(self.plugins)
-        #self.plugins.remove('genericObjects')
+        self.plugins.remove('genericObjects')
         
     
     def exec_scan(self,scan):
