@@ -118,6 +118,7 @@ class sharker(object):
         self.min_fetch = 1
         self.db = db
         self._find_plugins()
+        self.verbose = True
     
     def _fetch(self):
         news = self.db.get_NewScans()
@@ -134,6 +135,8 @@ class sharker(object):
     def exec_scan(self,scan):
         if 'type' in scan.keys():
             if scan['type'] in self.plugins:
+                if self.verbose:
+                    print("\t\tScan type: " + scan['type'])
                 try:
                     plugin, scan_type = scan['type'].split('-')
                     module = "sharkPlugins." + plugin + ".command"
@@ -145,7 +148,9 @@ class sharker(object):
                     if scan_type in plugin_module.supported_types:
                         plugin_module.selected_type(scan_type)
                     
-                    plugin_module.target = scan['target']    
+                    plugin_module.target = scan['target'] 
+                    if self.verbose:
+                        print("\t\tMarking scan as running")   
                     self.db.set_ScanAsRunning(scan['name'])
                     plugin_module.run()
                                         
@@ -157,11 +162,17 @@ class sharker(object):
             current = time()
             s_current = int(str(current).split('.')[0])
             print("Time: " + str(s_current))
+            if self.verbose:
+                print("Scans posted:")
             for scan in self._fetch():
+                if self.verbose:
+                    print("\t"+scan['name'])
                 if "scheduled" in scan.keys():
+                    if self.verbose:
+                        print("\t\tscheduled for: "+scan['scheduled'])
                     if scan['scheduled'] != None:
                         scheduled = int(scan['scheduled'])
-                        if scheduled >= s_current:
+                        if s_current >= scheduled:
                             print("\t" + "Scheduled and will run: " + str(scan['scheduled']))
                             self.exec_scan(scan)
             sleep(60)
