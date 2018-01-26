@@ -85,10 +85,20 @@ class mdb(object):
 
 	def set_ScanAsRunning(self,name):
 		update = {"$set":{"state":"running"}}
-		search_filter = {"name":name,"state":"new"}
+		query = {"name":name,"state":"new"}
 		
-		self._running_collection.update_one(search_filter,update)
+		self._running_collection.update_one(query,update)
+	
+	def set_ScanAsFailed(self,name):
+		query = {"name":name}
+		update = {"$set":{"state":"failed"}}
 		
+		self._running_collection.update_one(query,update)
+	
+	def set_ScanAsFinished(self,name,path):
+		query = {"name":name}
+		update = {"$set":{"state":"finished","path":path}}
+		self._running_collection.update_one(query,update)
 	
 	def SendNewScan(self,name,target,scan_type=None,args=None,schedule_date=None):
 		newScan = {				

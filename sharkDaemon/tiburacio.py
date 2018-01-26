@@ -201,9 +201,13 @@ class sharker(object):
                 #Setting the target
                 plugin.target = scan['target']
                 try:
+                    self.db.set_ScanAsRunning(scan['name'])
                     plugin.run()
                 except:
+                    self.db.set_ScanAsFailed(scan['name'])
                     print("Could not run the plugin")
+                else:
+                    self.db.set_ScanAsFinished(scan['name'],plugin.output_path)
             else:
                 raise NoPluginAvailable(scan['type'])       
     
