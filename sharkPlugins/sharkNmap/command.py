@@ -39,7 +39,3 @@ class p_scan(Plugin):
         
         self.supported_types.append(osscan)
     
-    def scan_os(self):
-        self.set_target("127.0.0.1")
-        self.selected_type = 1
-        self.run()

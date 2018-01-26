@@ -119,6 +119,11 @@ class sharker(object):
     #format: sharker.plugins.update{"pluginName":Object}
     plugins = {}
     
+    #Array with plugins asociated with their scans types
+    scan_types = []
+    
+    plugin_types = []
+    
     def __init__(self, db):
         #Min time to fetch (in minutes)
         self.min_fetch = 1
@@ -147,50 +152,60 @@ class sharker(object):
         if self.verbose:
             print("\tLoading plugin: " + pluginName)
         try:
-            p = locate("sharkPlugins."+pluginName+".command.p_scan")
-            sharker.plugins.update({pluginName:p})
-        except:
-            print("\t\tNot possible load " + pluginName)
-
+            #Loading the class for the plugin
+            plugin_class = locate("sharkPlugins."+pluginName+".command.p_scan")
             
+            #Creating the object from the class loaded
+            plugin_object = plugin_class()
+            
+            #Updating the plugins available on the sharker class
+            #loading the plugin object on the dictionary
+            sharker.plugins.update({pluginName:plugin_object})
+            
+            #Then we search the supported types of scans for the plugin
+            types = [p.name for p in plugin_object.supported_types]
+            
+            #and update the sharker class with the dictionary of plugin:types
+            sharker.plugin_types.append({pluginName:types})
+            sharker.scan_types.extend(types)
+        except Exception as err:
+            print("\tNot possible load " + pluginName)
     
     def _load_all_plugins(self):
         self._find_plugins()
         print("Loading all plugins:")
         for plugin in self.plugins_found:
             self._load_plugin(plugin)
-        
+    
+    def find_plugin(self,scan_type):
+        for plugin in self.plugins_found:
+            for p in self.plugin_types:
+                if scan_type in p[plugin]:
+                    return(plugin)
+            
     def exec_scan(self,scan):
         
         if self.verbose:
-            print("\t\t\tAvailable plugins " + str(self.plugins))
+            print("\t\t\tAvailable scans " + str(self.scan_types))
             print("\t\t\tSelected scan type: " + scan['type'])
             
         if 'type' in scan.keys():
-            if scan['type'] in self.plugins:
+            if scan['type'] in self.scan_types:
                 if self.verbose:
                     print("\t\tScan type: " + scan['type'])
-                try:
-                    plugin, scan_type = scan['type'].split('-')
-                    module = "sharkPlugins." + plugin + ".command"
-                    plugin_module = import_module(module)
-                except:
-                    print("Can't import the requested plugin")
-                    return(1)
-                else:
-                    if scan_type in plugin_module.supported_types:
-                        plugin_module.selected_type(scan_type)
                     
-                    plugin_module.target = scan['target'] 
-                    if self.verbose:
-                        print("\t\tMarking scan as running")   
-                    self.db.set_ScanAsRunning(scan['name'])
-                    plugin_module.run()
+                #Select the plugin
+                required_plugin = self.find_plugin(scan['type'])
+                plugin = self.plugins[required_plugin]
+                
+                #Setting the target
+                plugin.target = scan['target']
+                try:
+                    plugin.run()
+                except:
+                    print("Could not run the plugin")
             else:
-                raise NoPluginAvailable(scan['type'])
-                                        
-            
-            
+                raise NoPluginAvailable(scan['type'])       
     
     def run(self):
         while True:
