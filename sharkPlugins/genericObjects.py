@@ -17,6 +17,12 @@ class Plugin(object):
     '''
     Generic Plugin Object
     '''
+    #This variable, is set to load the list of
+    #plugins and their available scans
+    #each plugin should load its name and their 
+    #scans types
+    
+    found_plugins = {}
     def __init__(self,name,binary,description=None):
         
         #Name of the plugin

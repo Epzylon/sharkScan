@@ -7,8 +7,9 @@ from time import time
 from pathlib import Path as path
 from sharkPlugins.genericObjects import Plugin, ScanType
 
-class scan(Plugin):
+class p_scan(Plugin):
     ''' Nmap plugin '''
+        
     def __init__(self):
         ''' plugin constructor '''
         name = "NmapPlugin"
@@ -26,6 +27,7 @@ class scan(Plugin):
         path(folder).mkdir(parents=True,exist_ok=True)
         
         self.__set_supported_types()
+        Plugin.found_plugins.update({self.name:self.supported_types})
     
     def __set_supported_types(self):
         

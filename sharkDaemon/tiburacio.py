@@ -1,6 +1,8 @@
+from sharkDaemon.bullshark import NoPluginAvailable
 from time import time, sleep
 from pkgutil import iter_modules as find_modules
 from importlib import import_module
+from pydoc import locate
 from json import load
 from bottle import Bottle, response, request
 from threading import Thread
@@ -113,12 +115,17 @@ class whiteShark(Bottle):
  
 class sharker(object):
     ''' A daemon object to pull and run scans '''
+    #Dictionary for loaded plugins
+    #format: sharker.plugins.update{"pluginName":Object}
+    plugins = {}
+    
     def __init__(self, db):
         #Min time to fetch (in minutes)
         self.min_fetch = 1
-        self.db = db
-        self._find_plugins()
+        self.db = db        
         self.verbose = True
+        
+        self._load_all_plugins()
     
     def _fetch(self):
         news = self.db.get_NewScans()
@@ -128,11 +135,37 @@ class sharker(object):
             return(None)
         
     def _find_plugins(self):
-        self.plugins = [module for _, module, _ in find_modules(['sharkPlugins'])]
-        self.plugins.remove('genericObjects')
-        
+        if self.verbose:
+            print("Searching plugins:")
+        self.plugins_found = [module for _, module, _ in find_modules(['sharkPlugins'])]
+        self.plugins_found.remove('genericObjects')
+        if self.verbose:
+            for plugin in self.plugins_found:
+                print("\tPlugin found: " + plugin)
+           
+    def _load_plugin(self, pluginName):
+        if self.verbose:
+            print("\tLoading plugin: " + pluginName)
+        try:
+            p = locate("sharkPlugins."+pluginName+".command.p_scan")
+            sharker.plugins.update({pluginName:p})
+        except:
+            print("\t\tNot possible load " + pluginName)
+
+            
     
+    def _load_all_plugins(self):
+        self._find_plugins()
+        print("Loading all plugins:")
+        for plugin in self.plugins_found:
+            self._load_plugin(plugin)
+        
     def exec_scan(self,scan):
+        
+        if self.verbose:
+            print("\t\t\tAvailable plugins " + str(self.plugins))
+            print("\t\t\tSelected scan type: " + scan['type'])
+            
         if 'type' in scan.keys():
             if scan['type'] in self.plugins:
                 if self.verbose:
@@ -153,6 +186,8 @@ class sharker(object):
                         print("\t\tMarking scan as running")   
                     self.db.set_ScanAsRunning(scan['name'])
                     plugin_module.run()
+            else:
+                raise NoPluginAvailable(scan['type'])
                                         
             
             
