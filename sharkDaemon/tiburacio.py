@@ -124,6 +124,8 @@ class sharker(object):
     
     plugin_types = []
     
+    defautl_type = "os-scan"
+    
     def __init__(self, db):
         #Min time to fetch (in minutes)
         self.min_fetch = 1
@@ -188,29 +190,31 @@ class sharker(object):
         if self.verbose:
             print("\t\t\tAvailable scans " + str(self.scan_types))
             print("\t\t\tSelected scan type: " + scan['type'])
-            
-        if 'type' in scan.keys():
-            if scan['type'] in self.scan_types:
-                if self.verbose:
-                    print("\t\tScan type: " + scan['type'])
-                    
-                #Select the plugin
-                required_plugin = self.find_plugin(scan['type'])
-                plugin = self.plugins[required_plugin]
+        
+        if 'type' not in scan.keys():
+            if self.verbose:
+                print("No scan type selected. Using default")
+            scan.update({'type':self.defautl_type})
+        else:
+            if self.verbose:
+                print("Scan type selected " + scan['type'])
                 
-                #Setting the target
-                plugin.target = scan['target']
-                try:
-                    self.db.set_ScanAsRunning(scan['name'])
-                    plugin.run()
-                except:
-                    self.db.set_ScanAsFailed(scan['name'])
-                    print("Could not run the plugin")
-                else:
-                    self.db.set_ScanAsFinished(scan['name'],plugin.output_path)
-            else:
-                raise NoPluginAvailable(scan['type'])       
+        #Select the plugin
+        required_plugin = self.find_plugin(scan['type'])
+        plugin = self.plugins[required_plugin]
     
+        #Setting the target
+        plugin.target = scan['target']
+        
+        try:
+            self.db.set_ScanAsRunning(scan['name'])
+            plugin.run()
+        except:
+            self.db.set_ScanAsFailed(scan['name'])
+            print("Could not run the plugin")
+        else:
+            self.db.set_ScanAsFinished(scan['name'],plugin.output_path)
+            
     def run(self):
         while True:
             current = time()
