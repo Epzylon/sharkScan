@@ -3,30 +3,31 @@ import xml.etree.ElementTree as ET
 from json import dumps as jsdump
 from json import loads as jsload
 from sharkPlugins.sharkNmap.nmapxmlconfig import NmapConfig
+from sharkPlugins.genericObjects import Parser
 
 class CantOpenXML(Exception):
 	def __init__(self,filename):
 		self.filename = filename
 		print("Can't open XML: " + self.filename)
 
-class NmapScanToJson(NmapConfig):
-	def __init__(self,xml):
-		self.xml = xml
-		self.name = ""
+class NmapScanToJson(Parser,NmapConfig):
+	def __init__(self,xml=None):
+		if xml != None:
+			self.xml = xml
+			self.set_input_file(self.xml)
+			
+		self.scan_name = ""
 		self.jsonDict = {"hosts":[]}
-		try:
-			self._xml_fd = open(self.xml,"r")
-		except:
-			raise CantOpenXML(self.xml)
-		else:
-			self._xml_list = self._xml_fd.readlines()
-			self._parse()
+		self.parsers_list = ['xml-json']
+		self.selected_parser_type = self.parsers_list[0]
+		super(NmapScanToJson,self).__init__("NmapParser", self.parsers_list)
+		
+		
 
 	def __get_status(self,host):
 		#get the host status
 		status = host.find(self.x_status).attrib.get(self.s_state)
 		return(status)
-
 
 	def __get_addresses(self,host):
 
@@ -50,7 +51,6 @@ class NmapScanToJson(NmapConfig):
 
 		return(result)
 
-
 	def __get_ports(self,host):
 
 		#Result
@@ -65,7 +65,10 @@ class NmapScanToJson(NmapConfig):
 			#Getting the port info
 			number = port.attrib.get(self.p_num)
 			protocol = port.attrib.get(self.p_proto)
-			state = port.find(self.p_state).attrib.get(self.p_state)
+			try:
+				state = port.find(self.p_state).attrib.get(self.p_state)
+			except:
+				state = None
 			#Saving open ports
 			if state == "open":
 				if protocol == "tcp":
@@ -80,7 +83,6 @@ class NmapScanToJson(NmapConfig):
 			result.update({"udp_ports": udp_ports})
 
 		return(result)
-
 
 	def __get_os(self,host):
 
@@ -101,7 +103,9 @@ class NmapScanToJson(NmapConfig):
 				vendor = possible_class.attrib.get(self.o_vendor)
 				family = possible_class.attrib.get(self.o_family)
 				version = possible_class.attrib.get(self.o_version)
-				cpe = possible_class.find(self.o_cpe).text
+				cpe = possible_class.find(self.o_cpe)
+				if cpe != None:
+					cpe = cpe.text
 
 				os_possible = {
 				"name":name,
@@ -117,7 +121,6 @@ class NmapScanToJson(NmapConfig):
 				result.update({"os_match":os_matchs})
 
 		return(result)
-
 
 	def __get_hostname(self,host):
 
@@ -141,7 +144,7 @@ class NmapScanToJson(NmapConfig):
 		end_time = finished.attrib.get(self.scan_time)
 		elapsed = finished.attrib.get(self.scan_elapsed)
 		summary = finished.attrib.get(self.scan_summary)
-		exit = finished.attrib.get(self.scan_exit)
+		exit_status = finished.attrib.get(self.scan_exit)
 
 		stats = {
 		"stats": 
@@ -150,25 +153,26 @@ class NmapScanToJson(NmapConfig):
 			"finish_time":end_time,
 			"elapsed":elapsed,
 			"summary":summary,
-			"exit":exit
+			"exit":exit_status
 			}
 		}
 
 		return(stats)
 
-
-
+	@property
+	def _result(self):
+		return(self.get_json())
+		
 	def _parse(self):
 		#xmlObject: contains the xml object of the scan
-		xmlObject = ET.fromstringlist(self._xml_list)
+		xmlObject = ET.fromstringlist(self._string_list)
 		
 		#Setting the stats section
 		self.jsonDict.update(self.__get_stats(xmlObject))
 
 		#Setting the scan name
-		if self.name != "":
-			print("setting name on json")
-			self.jsonDict.update({"name": self.name})
+		if self.scan_name != "":
+			self.jsonDict.update({"name": self.scan_name})
 
 		#Walking over the xml host by host
 		for host in xmlObject.findall(self.x_host):
@@ -182,7 +186,6 @@ class NmapScanToJson(NmapConfig):
 				hostDict.update(self.__get_os(host))
 				hostDict.update(self.__get_hostname(host))
 				
-
 				self.jsonDict["hosts"].append(hostDict)
 			else:
 				continue
@@ -192,5 +195,6 @@ class NmapScanToJson(NmapConfig):
 		self._parse()
 
 	def get_json(self):
+		self._parse()
 		#TODO: this most probably needs a fix
 		return(jsload(jsdump(self.jsonDict)))

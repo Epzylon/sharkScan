@@ -20,7 +20,9 @@ class NmapConfig(object):
 	#Address attribs
 	a_type = 'addrtype'
 	a_addr = 'addr'
-
+	
+	#hostname
+	h_name = 'name'
 	#Os attribs
 	o_name = 'name'
 	o_accuracy = 'accuracy'

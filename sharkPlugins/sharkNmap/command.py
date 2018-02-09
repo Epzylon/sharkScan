@@ -18,6 +18,9 @@ class p_scan(Plugin):
         Plugin.__init__(self,name,nmap_binary,description)
         self.version = 0.1
         
+        #Parser
+        self.set_parser('sharkPlugins.sharkNmap.nmap2json.NmapScanToJson')
+        
         #Output configuration
         self.output_parameter = '-oX'
         folder = '/tmp/sharkScan/nmap/'
@@ -38,4 +41,5 @@ class p_scan(Plugin):
         osscan.require_privileges = True
         
         self.supported_types.append(osscan)
-    
+
+        

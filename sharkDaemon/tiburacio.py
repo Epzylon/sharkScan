@@ -1,7 +1,5 @@
-from sharkDaemon.bullshark import NoPluginAvailable
 from time import time, sleep
 from pkgutil import iter_modules as find_modules
-from importlib import import_module
 from pydoc import locate
 from json import load
 from bottle import Bottle, response, request
@@ -134,12 +132,20 @@ class sharker(object):
         
         self._load_all_plugins()
     
-    def _fetch(self):
+    def _fetch_new(self):
         news = self.db.get_NewScans()
         if len(news) > 0:
             return(news)
         else:
             return(None)
+    
+    def _fetch_finished(self):
+        finished = self.db.get_FinishedScans()
+        if finished != None:
+            if len(finished) > 0:
+                return(finished)
+            else:
+                return([])
         
     def _find_plugins(self):
         if self.verbose:
@@ -170,7 +176,7 @@ class sharker(object):
             #and update the sharker class with the dictionary of plugin:types
             sharker.plugin_types.append({pluginName:types})
             sharker.scan_types.extend(types)
-        except Exception as err:
+        except Exception:
             print("\tNot possible load " + pluginName)
     
     def _load_all_plugins(self):
@@ -206,6 +212,9 @@ class sharker(object):
         #Setting the target
         plugin.target = scan['target']
         
+        #Setting the parser type
+        scan.update({'parser_type':plugin.parser.selected_parser_type})
+        
         try:
             self.db.set_ScanAsRunning(scan['name'])
             plugin.run()
@@ -213,8 +222,29 @@ class sharker(object):
             self.db.set_ScanAsFailed(scan['name'])
             print("Could not run the plugin")
         else:
-            self.db.set_ScanAsFinished(scan['name'],plugin.output_path)
+            self.db.set_ScanAsFinished(scan['name'],
+                                       plugin.output_path,
+                                       plugin.parser_string,
+                                       scan['parser_type'])
+  
+    def load_scan(self,scan):
+        #First we need check if all the attributes are found 
+        all_attr_found = True
+        attributes = ['name','path','parser','parser_type']
+        for attribute in attributes:
+            if attribute not in scan:
+                all_attr_found = False
+        if all_attr_found:
+            parser_class = locate(scan['parser'])
+            parser = parser_class()
+            parser.selected_parser = scan['parser_type']
+            parser.set_input_file(scan['path'])
+            parser.scan_name = scan['name']
+            self.db.set_ScanAsUploading(scan)
+            self.db.loadFromJSON(parser.parse())
+            self.db.set_ScanAsUploaded(scan)
             
+                
     def run(self):
         while True:
             current = time()
@@ -222,7 +252,9 @@ class sharker(object):
             print("Time: " + str(s_current))
             if self.verbose:
                 print("Scans posted:")
-            for scan in self._fetch():
+                
+            #Searching for a new posted Scans
+            for scan in self._fetch_new():
                 if self.verbose:
                     print("\t"+scan['name'])
                 if "scheduled" in scan.keys():
@@ -232,7 +264,25 @@ class sharker(object):
                         scheduled = int(scan['scheduled'])
                         if s_current >= scheduled:
                             print("\t" + "Scheduled and will run: " + str(scan['scheduled']))
-                            self.exec_scan(scan)
+                            self.exec_scan(scan)    
+
+            #Then search the finished scans
+            if self.verbose:
+                print("Finished Scans:")
+            finished = self._fetch_finished()
+            if finished != None:
+                for scan in finished:
+                    if self.verbose:
+                        print("\t"+scan['name'])
+                        print("\tLoading scan:")
+                    #try:
+                    self.load_scan(scan)
+                    #except Exception as err:
+                    #    print("\t\tCan't load the scan")
+                    #    if self.verbose:
+                    #        print("\t\t\t"+str(err))
+            else:
+                print("\tNo finished scans to be loaded")
             sleep(60)
 
 class spilberg(object):
@@ -247,9 +297,9 @@ class spilberg(object):
     
     def run(self):
         #Lets run to threads
-        webservice = Thread(target=self._whiteshark.run)
+        #webservice = Thread(target=self._whiteshark.run)
         daemon = Thread(target=self._sharker.run)
-        webservice.start()
+        #webservice.start()
         daemon.start()
         
         

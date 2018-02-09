@@ -17,7 +17,6 @@ class mdb(object):
 		self.run_collection = "running"
 		self.projection = { "_id": 0 }
 
-
 	def connect(self):
 		try:
 			#Mongo connection
@@ -79,6 +78,9 @@ class mdb(object):
 	def get_NewScans(self):
 		return(self.get_PostedScanByState("new"))
 	
+	def get_FinishedScans(self):
+		return(self.get_PostedScanByState("finished"))
+	
 	def get_NewScanByName(self,name):
 		query = {"state":"new","name":name}
 		return(self._running_collection.find_one(query,self.projection))
@@ -95,11 +97,32 @@ class mdb(object):
 		
 		self._running_collection.update_one(query,update)
 	
-	def set_ScanAsFinished(self,name,path):
+	def set_ScanAsFinished(self,name,path,parser,p_type):
 		query = {"name":name}
-		update = {"$set":{"state":"finished","path":path}}
+		update = {"$set":
+				{"state":"finished",
+				"path":path,
+				"parser":parser,
+				"parser_type":p_type}
+				}
 		self._running_collection.update_one(query,update)
 	
+	def set_ScanAsUploading(self,scan):
+		query = {'name':scan['name']}
+		update = {'$set':{'state':'uploading'}}
+		self._running_collection.update(query,update)
+	
+	def set_ScanAsUploaded(self,scan):
+		query = {'name':scan['name']}
+		update = {'$set':{'state':'uploaded'}}
+		self._running_collection.update(query,update)
+		
+		
+	def loadFromJSON(self,json):
+		r = self._collection.insert_one(json)
+		print(r.inserted_id)
+
+		
 	def SendNewScan(self,name,target,scan_type=None,args=None,schedule_date=None):
 		newScan = {				
 				"name":name,
@@ -125,7 +148,6 @@ class mdb(object):
 		except:
 			return(False)
 		
-
 	def get_hostInScan(self,address,scan_name):
 		query = {"name":scan_name}
 		projection = {"_id":0,"hosts":1}
@@ -144,8 +166,6 @@ class mdb(object):
 				else:
 					return(None)
 				
-		
-
 	def get_ScanByName(self,name):
 		query = { "name": name }
 		result = self._collection.find_one(query,self.projection)
