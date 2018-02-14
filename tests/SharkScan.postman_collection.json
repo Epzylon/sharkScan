@@ -1,0 +1,135 @@
+{
+	"id": "eb79d47e-4a61-1d3c-3199-1204cdbf702b",
+	"name": "SharkScan",
+	"description": "",
+	"order": [
+		"c0f72fe4-cedd-03f6-56a5-7f06b3da065c",
+		"8c5ab7a2-a24c-90c2-5ce7-2b0bc172305e",
+		"8d5e1c09-e537-17e6-0bbd-f2f6977e71fe",
+		"8c08f6fc-0edd-43da-e5b9-7f45aff2b16e"
+	],
+	"folders": [],
+	"folders_order": [],
+	"timestamp": 1511973593817,
+	"owner": "1688394",
+	"public": false,
+	"requests": [
+		{
+			"id": "8c08f6fc-0edd-43da-e5b9-7f45aff2b16e",
+			"headers": "Content-Type: application/json\n",
+			"headerData": [
+				{
+					"key": "",
+					"value": "",
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "Content-Type",
+					"value": "application/json",
+					"description": "",
+					"enabled": true
+				}
+			],
+			"url": "localhost:9898/api/v1.0/Scans",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "POST",
+			"data": [],
+			"dataMode": "raw",
+			"version": 2,
+			"tests": "",
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1512397607888,
+			"name": "SharkScan - /Scans POST",
+			"description": "Post new scan",
+			"collectionId": "eb79d47e-4a61-1d3c-3199-1204cdbf702b",
+			"responses": [],
+			"rawModeData": "{\n\"name\": \"scan.of.my.network\",\n\"type\": \"nmap-os\",\n\"args\": \"--script smb-os-discovery\",\n\"target\": \"192.168.0.0/16\"\n}"
+		},
+		{
+			"id": "8c5ab7a2-a24c-90c2-5ce7-2b0bc172305e",
+			"headers": "",
+			"headerData": [],
+			"url": "localhost:9898/api/v1.0/Scans?from_date=1494938020&to_date=1495548000",
+			"queryParams": [
+				{
+					"key": "from_date",
+					"value": "1494938020",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				},
+				{
+					"key": "to_date",
+					"value": "1495548000",
+					"equals": true,
+					"description": "",
+					"enabled": true
+				}
+			],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1512396947199,
+			"name": "SharkScan - /Scans/ScanName",
+			"description": "Scan by Name",
+			"collectionId": "eb79d47e-4a61-1d3c-3199-1204cdbf702b",
+			"responses": []
+		},
+		{
+			"id": "8d5e1c09-e537-17e6-0bbd-f2f6977e71fe",
+			"headers": "",
+			"headerData": [],
+			"url": "localhost:8080/api/v1.0/Scans/Reconquista/76.252.0.11",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1516793215827,
+			"name": "SharkScan - /Scans/ScanName/Address",
+			"description": "Info about one particular host in a Scan",
+			"collectionId": "eb79d47e-4a61-1d3c-3199-1204cdbf702b",
+			"responses": []
+		},
+		{
+			"id": "c0f72fe4-cedd-03f6-56a5-7f06b3da065c",
+			"headers": "",
+			"headerData": [],
+			"url": "localhost:9898/api/v1.0/Scans",
+			"queryParams": [],
+			"preRequestScript": null,
+			"pathVariables": {},
+			"pathVariableData": [],
+			"method": "GET",
+			"data": null,
+			"dataMode": "params",
+			"version": 2,
+			"tests": null,
+			"currentHelper": "normal",
+			"helperAttributes": {},
+			"time": 1511973852360,
+			"name": "SharkScan - /Scans",
+			"description": "Scans in general",
+			"collectionId": "eb79d47e-4a61-1d3c-3199-1204cdbf702b",
+			"responses": []
+		}
+	]
+}

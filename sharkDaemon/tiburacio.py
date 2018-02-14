@@ -12,13 +12,17 @@ class whiteShark(Bottle):
         self.response_type = 'application/json'
         self.db = db
         self._route_all()
-    
+        self.port = 8080
+        self.host = '127.0.0.1'
+            
     def _route_all(self):
         self.route('/api/v1.0/Scans',callback=self.get_scans)
         self.route('/api/v1.0/Scans',method='POST',callback=self.post_scan)
         self.route('/api/v1.0/Scans/<name>',callback=self.get_scanByName)
         self.route('/api/v1.0/Scans/<name>/<address>',callback=self.get_hostScanAddress)
         
+    def run(self, **kwargs):
+        Bottle.run(self, port=self.port, host=self.host, **kwargs)
         
     #@route('/api/v1.0/Scans')
     def get_scans(self):
@@ -311,12 +315,32 @@ class spilberg(object):
         self._db.connect()
         self._sharker = sharker(self._db)
         self._whiteshark = whiteShark("sharkScan",self._db)
+        self.port = 8080
+        self.host = '127.0.0.1'
+        self.run_webservice = True
+        self.run_daemon = True
+        self.verbose = True
     
     def run(self):
-        #Lets run to threads
-        webservice = Thread(target=self._whiteshark.run)
-        daemon = Thread(target=self._sharker.run)
-        webservice.start()
-        daemon.start()
+        if not self.run_daemon and not self.run_webservice:
+            if self.verbose:
+                print("No daemon tu run, no webservice, nothing to do....")
+            return(1)
+        else:
+            if self.run_daemon:
+                if self.verbose:
+                    print("Running daemon...")
+                daemon = Thread(target=self._sharker.run)
+                daemon.start()
+            if self.run_webservice:
+                if self.verbose:
+                    print("Running webservice...")
+                self._whiteshark.port = self.port
+                self._whiteshark.host = self.host
+                webservice = Thread(target=self._whiteshark.run)
+                webservice.start()
+
+
+
         
         
