@@ -96,10 +96,13 @@ class whiteShark(Bottle):
         if result != None:
             return(result)
         else:
-            response.status = 404
-            return(None)
+            result = self.db.get_PostedScanByName(name)
+            if result != None:
+                return(result)
+            else:
+                response.status = 404
+                return(None)
         
-    
     #@route('/api/v1.0/Scans/<name>/<address>')
     def get_hostScanAddress(self,name,address):
         #Get the host in a particular scan
@@ -134,7 +137,7 @@ class sharker(object):
     
     def _fetch_new(self):
         news = self.db.get_NewScans()
-        if len(news) > 0:
+        if news != None:
             return(news)
         else:
             return(None)
@@ -254,17 +257,28 @@ class sharker(object):
                 print("Scans posted:")
                 
             #Searching for a new posted Scans
-            for scan in self._fetch_new():
-                if self.verbose:
-                    print("\t"+scan['name'])
-                if "scheduled" in scan.keys():
+            newScans = self._fetch_new()
+            if newScans != None:
+                for scan in newScans:
                     if self.verbose:
-                        print("\t\tscheduled for: "+scan['scheduled'])
-                    if scan['scheduled'] != None:
-                        scheduled = int(scan['scheduled'])
-                        if s_current >= scheduled:
-                            print("\t" + "Scheduled and will run: " + str(scan['scheduled']))
-                            self.exec_scan(scan)    
+                        print("\t"+scan['name'])
+                    if "scheduled" in scan.keys():
+                        if self.verbose:
+                            print("\t\tscheduled for: "+str(scan['scheduled']))
+                        if scan['scheduled'] != None:
+                            #Warning: in case of scans with scheduled key 
+                            # set to null, will never be executed
+                            scheduled = int(scan['scheduled'])
+                            if s_current >= scheduled:
+                                print("\t\t" + "Scheduled and will run")
+                                self.exec_scan(scan)
+                    else:
+                        if self.verbose:
+                            print("\t\tNot scheduled scan, will run:")
+                        self.exec_scan(scan)
+                            
+            else:
+                print('\tNo new scans')    
 
             #Then search the finished scans
             if self.verbose:
@@ -283,6 +297,9 @@ class sharker(object):
                     #        print("\t\t\t"+str(err))
             else:
                 print("\tNo finished scans to be loaded")
+            
+            if self.verbose:
+                print("Going to sleep by 1 minute")
             sleep(60)
 
 class spilberg(object):
@@ -297,9 +314,9 @@ class spilberg(object):
     
     def run(self):
         #Lets run to threads
-        #webservice = Thread(target=self._whiteshark.run)
+        webservice = Thread(target=self._whiteshark.run)
         daemon = Thread(target=self._sharker.run)
-        #webservice.start()
+        webservice.start()
         daemon.start()
         
         

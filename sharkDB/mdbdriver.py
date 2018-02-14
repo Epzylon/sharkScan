@@ -60,6 +60,30 @@ class mdb(object):
 		else:
 			return(dumps(total))
 	
+	def get_PostedScans(self):
+		scans = []
+		query = {}
+		projection = {"_id":0}
+		cursor = self._running_collection.find(query,projection)
+		for scan in cursor:
+			scans.append(scan)
+		if len(scans) > 0:
+			return(dumps(scans))
+		else:
+			return(None)
+		
+	def get_PostedScanByName(self,name):
+		scans = []
+		query = {'name':name}
+		projection = {"_id":0}
+		cursor = self._running_collection.find(query,projection)
+		for scan in cursor:
+			scans.append(scan)
+		if len(scans) > 0:
+			return(dumps(scans))
+		else:
+			return(None)
+		
 	def get_PostedScanByState(self,state):
 		scans = []
 		query = {"state":state}
@@ -71,7 +95,7 @@ class mdb(object):
 			return(scans)
 		else:
 			return(None)
-
+			
 	def get_RunningScans(self):
 		return(self.get_PostedScanByState("running"))
 	
@@ -159,7 +183,7 @@ class mdb(object):
 			
 				for host in hosts:
 					if host['address'] == address:
-						found = host['address'] 
+						found = host
 			
 				if found != '':
 					return(dumps(found))
