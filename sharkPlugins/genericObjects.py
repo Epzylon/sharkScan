@@ -99,7 +99,11 @@ class Plugin(object):
     
     @target.setter
     def target(self, value):     
-        self._target = value               
+        self._target = value 
+        
+        #Blanking the args
+        #WARNING: this is muggy
+        self.args = ""                 
         #Check if there are target parameter to be set
         if self.target_parameter != None:
             self.args = self.args + self.target_parameter
