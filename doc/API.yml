@@ -89,7 +89,7 @@ mediaType: application/json
       example: |
       {
         "name": "scan.of.my.network",
-        "type": "nmap-os",
+        "type": "os-scan",
         "args": "--script smb-os-discovery"
         "target": "192.168.0.0/16"
       }
@@ -100,7 +100,7 @@ mediaType: application/json
             example: |
             {
               "name": "scan.of.my.network",
-              "type": "nmap-os",
+              "type": "os-scan",
               "args": "--script smb-os-discovery"
               "target": "192.168.0.0/16",
               "state": "new",
